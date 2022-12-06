@@ -4,6 +4,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import jakarta.transaction.Transactional;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -36,4 +37,12 @@ public class CustomerController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.map(customerService.findById(id), CustomerResponseDto.class));
     }
 
+    @GetMapping
+    public ResponseEntity<List<CustomerResponseDto>> getAllCustomers() {
+        return ResponseEntity.status(HttpStatus.OK).body(customerService
+                .findAllCustomers()
+                .stream()
+                .map(customer -> mapper.map(customer, CustomerResponseDto.class))
+                .toList());
+    }
 }
