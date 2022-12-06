@@ -12,7 +12,7 @@ public interface CustomerService {
 
     CustomerResponseDto create(CustomerRequestDto customerRequestDto);
 
-    CustomerResponseDto findById(UUID id);
+    CustomerResponseDto getById(UUID id);
 
     List<CustomerResponseDto> findAllCustomers();
 

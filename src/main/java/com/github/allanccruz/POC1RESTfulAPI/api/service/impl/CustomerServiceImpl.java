@@ -27,7 +27,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponseDto findById(UUID id) {
+    public CustomerResponseDto getById(UUID id) {
         return mapper.map(customerRepository
                 .findById(id)
                 .orElseThrow(() -> new RuntimeException("Customer not found!")), CustomerResponseDto.class);
@@ -58,7 +58,7 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public void deleteById(UUID id) {
-        Customer customer = mapper.map(findById(id), Customer.class);
+        Customer customer = mapper.map(getById(id), Customer.class);
         customerRepository.deleteById(customer.getId());
     }
 }

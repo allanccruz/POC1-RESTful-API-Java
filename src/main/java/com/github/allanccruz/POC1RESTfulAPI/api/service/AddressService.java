@@ -11,4 +11,6 @@ public interface AddressService {
     AddressResponseDto create(AddressRequestDto addressRequestDto);
 
     AddressResponseDto getById(UUID id);
+
+    void delete(UUID id);
 }

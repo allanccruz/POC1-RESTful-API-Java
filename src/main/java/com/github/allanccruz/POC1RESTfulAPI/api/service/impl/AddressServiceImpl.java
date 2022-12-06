@@ -42,4 +42,10 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new RuntimeException("Address not found!")), AddressResponseDto.class);
     }
 
+    @Override
+    public void delete(UUID id) {
+        Address address = mapper.map(getById(id), Address.class);
+        addressRepository.deleteById(address.getId());
+    }
+
 }
