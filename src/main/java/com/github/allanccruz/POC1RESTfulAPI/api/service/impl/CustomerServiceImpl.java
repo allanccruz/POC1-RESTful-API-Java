@@ -1,6 +1,7 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.service.impl;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.UpdateCustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
@@ -54,6 +55,20 @@ public class CustomerServiceImpl implements CustomerService {
                 .stream()
                 .map(address -> mapper.map(address, AddressResponseDto.class))
                 .toList();
+    }
+
+    @Override
+    public CustomerResponseDto update(UUID id, UpdateCustomerRequestDto updateCustomerRequestDto) {
+        Customer customer = customerRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+
+        customer.setName(updateCustomerRequestDto.getName());
+        customer.setEmail(updateCustomerRequestDto.getEmail());
+        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
+
+        customerRepository.save(customer);
+        return mapper.map(customer, CustomerResponseDto.class);
     }
 
     @Override

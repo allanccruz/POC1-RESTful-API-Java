@@ -37,8 +37,9 @@ public class AddressController {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.map(addressService.getById(id), AddressResponseDto.class));
     }
 
+    @Transactional
     @DeleteMapping("/{id}")
-    public void deleteAddressById(@PathVariable UUID id) {
+    public void deleteAddress(@PathVariable UUID id) {
         addressService.delete(id);
         ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
