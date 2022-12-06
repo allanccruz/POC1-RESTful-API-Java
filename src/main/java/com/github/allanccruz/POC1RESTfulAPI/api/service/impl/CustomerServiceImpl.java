@@ -22,8 +22,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDto create(CustomerRequestDto customerRequestDto) {
-        customerRepository.save(mapper.map(customerRequestDto, Customer.class));
-        return mapper.map(customerRequestDto, CustomerResponseDto.class);
+        Customer customer = customerRepository.save(mapper.map(customerRequestDto, Customer.class));
+        return mapper.map(customer, CustomerResponseDto.class);
     }
 
     @Override
@@ -54,5 +54,11 @@ public class CustomerServiceImpl implements CustomerService {
                 .stream()
                 .map(address -> mapper.map(address, AddressResponseDto.class))
                 .toList();
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Customer customer = mapper.map(findById(id), Customer.class);
+        customerRepository.deleteById(customer.getId());
     }
 }

@@ -17,4 +17,7 @@ public interface CustomerService {
     List<CustomerResponseDto> findAllCustomers();
 
     List<AddressResponseDto> getAllAddresses(UUID id);
+
+    void deleteById(UUID id);
+
 }
