@@ -29,20 +29,16 @@ public class CustomerController {
     @PostMapping
     @Transactional
     public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(customerService.create(customerRequestDto), CustomerResponseDto.class));
+        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerRequestDto));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CustomerResponseDto> findCustomer(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.map(customerService.findById(id), CustomerResponseDto.class));
+        return ResponseEntity.status(HttpStatus.OK).body(customerService.findById(id));
     }
 
     @GetMapping
     public ResponseEntity<List<CustomerResponseDto>> getAllCustomers() {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService
-                .findAllCustomers()
-                .stream()
-                .map(customer -> mapper.map(customer, CustomerResponseDto.class))
-                .toList());
+        return ResponseEntity.status(HttpStatus.OK).body(customerService.findAllCustomers());
     }
 }

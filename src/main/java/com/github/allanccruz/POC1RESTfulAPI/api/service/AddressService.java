@@ -1,14 +1,14 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.service;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
-import com.github.allanccruz.POC1RESTfulAPI.api.entities.Address;
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 
 @Service
 public interface AddressService {
 
-    Address create(AddressRequestDto addressRequestDto);
+    AddressResponseDto create(AddressRequestDto addressRequestDto);
 
-    Address getById(UUID id);
+    AddressResponseDto getById(UUID id);
 }

@@ -1,11 +1,12 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.service.impl;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Address;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.AddressRepository;
+import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
-import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -19,24 +20,26 @@ public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
 
-    private final CustomerService customerService;
+    private final CustomerRepository customerRepository;
 
     @Override
-    public Address create(AddressRequestDto addressRequestDto) {
-        Customer customer = customerService.findById(addressRequestDto.getCustomerIdDto().getId());
+    public AddressResponseDto create(AddressRequestDto addressRequestDto) {
 
-        if (customer.getAddresses().isEmpty()) {
-            addressRequestDto.setMainAddress(true);
-        } else {
-            addressRequestDto.setMainAddress(false);
-        }
+        Customer customer = customerRepository
+                .findById(addressRequestDto.getCustomerIdDto().getId())
+                .orElseThrow(() -> new RuntimeException("Customer not found!"));
 
-        return addressRepository.save(mapper.map(addressRequestDto, Address.class));
+        addressRequestDto.setMainAddress(customer.getAddresses().isEmpty());
+        addressRepository.save(mapper.map(addressRequestDto, Address.class));
+
+        return mapper.map(addressRequestDto, AddressResponseDto.class);
     }
 
     @Override
-    public Address getById(UUID id) {
-        return addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found!"));
+    public AddressResponseDto getById(UUID id) {
+        return mapper.map(addressRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Address not found!")), AddressResponseDto.class);
     }
 
 }

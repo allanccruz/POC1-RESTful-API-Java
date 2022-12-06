@@ -1,7 +1,7 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.service;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
-import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
@@ -9,9 +9,9 @@ import org.springframework.stereotype.Service;
 @Service
 public interface CustomerService {
 
-    Customer create(CustomerRequestDto customerRequestDto);
+    CustomerResponseDto create(CustomerRequestDto customerRequestDto);
 
-    Customer findById(UUID id);
+    CustomerResponseDto findById(UUID id);
 
-    List<Customer> findAllCustomers();
+    List<CustomerResponseDto> findAllCustomers();
 }

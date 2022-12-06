@@ -1,6 +1,7 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.service.impl;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
@@ -19,17 +20,24 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
     @Override
-    public Customer create(CustomerRequestDto customerRequestDto) {
-        return customerRepository.save(mapper.map(customerRequestDto, Customer.class));
+    public CustomerResponseDto create(CustomerRequestDto customerRequestDto) {
+        customerRepository.save(mapper.map(customerRequestDto, Customer.class));
+        return mapper.map(customerRequestDto, CustomerResponseDto.class);
     }
 
     @Override
-    public Customer findById(UUID id) {
-        return customerRepository.findById(id).orElseThrow(() -> new RuntimeException("Customer not found!"));
+    public CustomerResponseDto findById(UUID id) {
+        return mapper.map(customerRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Customer not found!")), CustomerResponseDto.class);
     }
 
     @Override
-    public List<Customer> findAllCustomers() {
-        return customerRepository.findAll();
+    public List<CustomerResponseDto> findAllCustomers() {
+        return customerRepository
+                .findAll()
+                .stream()
+                .map(customer -> mapper.map(customer, CustomerResponseDto.class))
+                .toList();
     }
 }
