@@ -1,6 +1,7 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.controller;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import jakarta.transaction.Transactional;
@@ -41,4 +42,10 @@ public class CustomerController {
     public ResponseEntity<List<CustomerResponseDto>> getAllCustomers() {
         return ResponseEntity.status(HttpStatus.OK).body(customerService.findAllCustomers());
     }
+
+    @GetMapping("/{id}/addresses")
+    public ResponseEntity<List<AddressResponseDto>> getAllAddressesOfCustomer(@PathVariable UUID id) {
+        return ResponseEntity.status(HttpStatus.OK).body(customerService.getAllAddresses(id));
+    }
+
 }
