@@ -3,6 +3,7 @@ package com.github.allanccruz.POC1RESTfulAPI.api.controller;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
+import jakarta.transaction.Transactional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -25,6 +26,7 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
+    @Transactional
     public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(customerService.create(customerRequestDto), CustomerResponseDto.class));
     }

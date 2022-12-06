@@ -6,6 +6,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.AddressRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -31,6 +32,11 @@ public class AddressServiceImpl implements AddressService {
         }
 
         return addressRepository.save(mapper.map(addressRequestDto, Address.class));
+    }
+
+    @Override
+    public Address getById(UUID id) {
+        return addressRepository.findById(id).orElseThrow(() -> new RuntimeException("Address not found!"));
     }
 
 }
