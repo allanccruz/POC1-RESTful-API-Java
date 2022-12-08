@@ -9,12 +9,12 @@ import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class CustomerServiceImpl implements CustomerService {
 
     private final ModelMapper mapper;

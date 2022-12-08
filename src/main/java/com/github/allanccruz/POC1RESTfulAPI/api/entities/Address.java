@@ -11,19 +11,18 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.sql.Types;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.annotations.Type;
 
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
-@Table (name = "tb_address")
+@AllArgsConstructor
+@NoArgsConstructor
+@Table(name = "tb_address")
 public class Address {
 
     @Id

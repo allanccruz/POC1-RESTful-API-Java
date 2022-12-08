@@ -6,7 +6,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
 import jakarta.transaction.Transactional;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +17,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RequestMapping("api/poc1/addresses")
 public class AddressController {
 
@@ -47,9 +48,9 @@ public class AddressController {
 
     @Transactional
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAddress(@PathVariable UUID id) {
         addressService.delete(id);
-        ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

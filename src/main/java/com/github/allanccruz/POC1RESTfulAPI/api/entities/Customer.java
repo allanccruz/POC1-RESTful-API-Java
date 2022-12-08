@@ -1,6 +1,6 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.entities;
 
-import com.github.allanccruz.POC1RESTfulAPI.api.enums.DocumentType;
+import com.github.allanccruz.POC1RESTfulAPI.api.enums.PersonType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -16,15 +16,17 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 
 @Entity
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "tb_customer")
 public class Customer {
 
@@ -42,9 +44,9 @@ public class Customer {
     @Column(nullable = false)
     private String document;
 
-    @Column(name = "document_type", nullable = false)
+    @Column(name = "person_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    private DocumentType documentType;
+    private PersonType personType;
 
     @Column(nullable = false)
     private String phoneNumber;

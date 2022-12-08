@@ -1,13 +1,13 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.dto.response;
 
 import java.util.UUID;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class AddressResponseDto {
 
     private UUID id;

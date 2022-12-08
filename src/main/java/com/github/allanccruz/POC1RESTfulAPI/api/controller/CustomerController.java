@@ -8,7 +8,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +19,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequiredArgsConstructor
+@AllArgsConstructor
 @RequestMapping("api/poc1/customers")
 public class CustomerController {
 
@@ -59,9 +60,9 @@ public class CustomerController {
 
     @Transactional
     @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCustomer(@PathVariable UUID id) {
         customerService.deleteById(id);
-        ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
 }

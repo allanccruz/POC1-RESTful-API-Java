@@ -3,6 +3,6 @@ create table tb_customer (
   	name varchar(255) not null,
   	email varchar(255) not null unique,
   	document varchar(255) not null unique,
-  	document_type enum('PF', 'PJ') not null,
+  	person_type enum('PF', 'PJ') not null,
   	phone_number varchar(255) not null
   );
