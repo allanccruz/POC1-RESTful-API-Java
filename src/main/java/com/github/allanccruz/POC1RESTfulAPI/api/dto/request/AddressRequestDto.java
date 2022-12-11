@@ -22,7 +22,7 @@ public class AddressRequestDto {
 
     private String cep;
 
-    private CustomerIdRequestDto customerIdDto;
+    private UUID customerId;
 
     private Boolean mainAddress;
 

@@ -27,13 +27,13 @@ public class AddressServiceImpl implements AddressService {
     public AddressResponseDto create(AddressRequestDto addressRequestDto) {
 
         Customer customer = customerRepository
-                .findById(addressRequestDto.getCustomerIdDto().getId())
+                .findById(addressRequestDto.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found!"));
 
         addressRequestDto.setMainAddress(customer.getAddresses().isEmpty());
-        addressRepository.save(mapper.map(addressRequestDto, Address.class));
+        Address address = addressRepository.save(mapper.map(addressRequestDto, Address.class));
 
-        return mapper.map(addressRequestDto, AddressResponseDto.class);
+        return mapper.map(address, AddressResponseDto.class);
     }
 
     @Override
