@@ -27,13 +27,18 @@ public class AddressServiceImpl implements AddressService {
     public AddressResponseDto create(AddressRequestDto addressRequestDto) {
 
         Customer customer = customerRepository
-                .findById(addressRequestDto.getCustomerIdDto().getId())
+                .findById(addressRequestDto.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found!"));
 
         addressRequestDto.setMainAddress(customer.getAddresses().isEmpty());
-        addressRepository.save(mapper.map(addressRequestDto, Address.class));
 
-        return mapper.map(addressRequestDto, AddressResponseDto.class);
+        if (customer.getAddresses().size() == 5) {
+            throw new RuntimeException("Limit of addresses reached!");
+        }
+
+        Address address = addressRepository.save(mapper.map(addressRequestDto, Address.class));
+
+        return mapper.map(address, AddressResponseDto.class);
     }
 
     @Override
@@ -54,6 +59,17 @@ public class AddressServiceImpl implements AddressService {
         address.setAddressNumber(updateAddressRequestDto.getAddressNumber());
         address.setComplement(updateAddressRequestDto.getComplement());
         address.setCep(updateAddressRequestDto.getCep());
+
+        if (updateAddressRequestDto.getMainAddress()) {
+            address.getCustomer().getAddresses()
+                    .stream()
+                    .forEach(addr -> addr.setMainAddress(false));
+
+            address.setMainAddress(true);
+        } else if (Boolean.TRUE.equals(address.getMainAddress())) {
+            throw new RuntimeException("You must have at least one main address!");
+        }
+
 
         addressRepository.save(address);
 

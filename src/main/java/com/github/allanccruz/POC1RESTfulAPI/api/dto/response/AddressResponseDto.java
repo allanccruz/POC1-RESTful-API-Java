@@ -3,10 +3,12 @@ package com.github.allanccruz.POC1RESTfulAPI.api.dto.response;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class AddressResponseDto {
 
@@ -21,6 +23,8 @@ public class AddressResponseDto {
     private String complement;
 
     private String cep;
+
+    private UUID customerId;
 
     private Boolean mainAddress;
 
