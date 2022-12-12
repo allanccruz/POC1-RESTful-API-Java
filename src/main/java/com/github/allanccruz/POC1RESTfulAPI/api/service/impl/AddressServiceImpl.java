@@ -60,6 +60,17 @@ public class AddressServiceImpl implements AddressService {
         address.setComplement(updateAddressRequestDto.getComplement());
         address.setCep(updateAddressRequestDto.getCep());
 
+        if (updateAddressRequestDto.getMainAddress()) {
+            address.getCustomer().getAddresses()
+                    .stream()
+                    .forEach(addr -> addr.setMainAddress(false));
+
+            address.setMainAddress(true);
+        } else if (Boolean.TRUE.equals(address.getMainAddress())) {
+            throw new RuntimeException("You must have at least one main address!");
+        }
+
+
         addressRepository.save(address);
 
         return mapper.map(address, AddressResponseDto.class);

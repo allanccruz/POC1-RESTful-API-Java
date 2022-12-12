@@ -19,4 +19,6 @@ public class UpdateAddressRequestDto {
 
     private String cep;
 
+    private Boolean mainAddress;
+
 }
