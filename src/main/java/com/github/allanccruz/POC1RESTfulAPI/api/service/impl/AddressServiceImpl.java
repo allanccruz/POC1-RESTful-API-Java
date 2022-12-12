@@ -31,6 +31,11 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new RuntimeException("Customer not found!"));
 
         addressRequestDto.setMainAddress(customer.getAddresses().isEmpty());
+
+        if (customer.getAddresses().size() == 5) {
+            throw new RuntimeException("Limit of addresses reached!");
+        }
+
         Address address = addressRepository.save(mapper.map(addressRequestDto, Address.class));
 
         return mapper.map(address, AddressResponseDto.class);
