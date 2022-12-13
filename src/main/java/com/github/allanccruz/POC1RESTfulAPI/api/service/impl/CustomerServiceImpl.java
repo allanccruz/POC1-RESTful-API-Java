@@ -51,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .orElseThrow(() -> new RuntimeException("Customer not found!"));
 
         return customer
-                .getAddresses()
+                .getCustomerAddresses()
                 .stream()
                 .map(address -> mapper.map(address, AddressResponseDto.class))
                 .toList();

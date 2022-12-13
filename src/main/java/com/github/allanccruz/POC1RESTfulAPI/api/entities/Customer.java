@@ -52,6 +52,6 @@ public class Customer {
     private String phoneNumber;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer", fetch = FetchType.EAGER)
-    private List<Address> addresses = new ArrayList<>();
+    private List<CustomerAddress> customerAddresses = new ArrayList<>();
 
 }

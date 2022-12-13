@@ -1,7 +1,6 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.controller;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
-import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.UpdateAddressRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
 import jakarta.transaction.Transactional;
@@ -42,8 +41,8 @@ public class AddressController {
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<AddressResponseDto> updateAddress(@PathVariable UUID id, @RequestBody UpdateAddressRequestDto updateAddressRequestDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.map(addressService.update(id, updateAddressRequestDto), AddressResponseDto.class));
+    public ResponseEntity<AddressResponseDto> updateAddress(@PathVariable UUID id, @RequestBody AddressRequestDto addressRequestDto) {
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.map(addressService.update(id, addressRequestDto), AddressResponseDto.class));
     }
 
     @Transactional
