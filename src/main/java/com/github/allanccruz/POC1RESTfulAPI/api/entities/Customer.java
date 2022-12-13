@@ -44,8 +44,8 @@ public class Customer {
     @Column(nullable = false)
     private String document;
 
-    @Column(name = "person_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "person_type", nullable = false)
     private PersonType personType;
 
     @Column(nullable = false)
