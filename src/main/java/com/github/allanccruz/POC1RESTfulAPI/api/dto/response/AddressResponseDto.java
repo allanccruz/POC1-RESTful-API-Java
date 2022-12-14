@@ -18,11 +18,13 @@ public class AddressResponseDto {
 
     private String neighborhood;
 
-    private String addressNumber;
+    private String address;
+
+    private String number;
 
     private String complement;
 
-    private String cep;
+    private String zipcode;
 
     private UUID customerId;
 

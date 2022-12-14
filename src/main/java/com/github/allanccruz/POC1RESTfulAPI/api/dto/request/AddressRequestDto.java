@@ -1,5 +1,7 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.validation.constraints.NotBlank;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -10,16 +12,21 @@ import lombok.Setter;
 @AllArgsConstructor
 public class AddressRequestDto {
 
-    private UUID id;
+    @JsonIgnore
+    private String localidade;
 
-    private String city;
+    @JsonIgnore
+    private String bairro;
 
-    private String neighborhood;
+    @JsonIgnore
+    private String logradouro;
 
-    private String addressNumber;
+    @NotBlank(message = "Number field cannot be blank")
+    private String numero;
 
-    private String complement;
+    private String complemento;
 
+    @NotBlank(message = "Zipcode field cannot be blank")
     private String cep;
 
     private UUID customerId;

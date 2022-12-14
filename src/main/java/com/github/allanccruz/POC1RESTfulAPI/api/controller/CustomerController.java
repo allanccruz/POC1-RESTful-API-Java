@@ -6,6 +6,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -33,7 +34,7 @@ public class CustomerController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody CustomerRequestDto customerRequestDto) {
+    public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerRequestDto));
     }
 
@@ -54,7 +55,7 @@ public class CustomerController {
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable UUID id, @RequestBody UpdateCustomerRequestDto updateCustomerRequestDto) {
+    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
         return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id, updateCustomerRequestDto));
     }
 

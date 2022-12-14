@@ -22,8 +22,8 @@ import org.hibernate.annotations.JdbcTypeCode;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Table(name = "tb_address")
-public class Address {
+@Table(name = "tb_customer_address")
+public class CustomerAddress {
 
     @Id
     @JdbcTypeCode(Types.VARCHAR)
@@ -36,14 +36,17 @@ public class Address {
     @Column(nullable = false)
     private String neighborhood;
 
-    @Column(nullable = false, name = "address_number")
-    private String addressNumber;
+    @Column(nullable = false)
+    private String address;
+
+    @Column(nullable = false, name = "number")
+    private String number;
 
     @Column
     private String complement;
 
     @Column(nullable = false)
-    private String cep;
+    private String zipcode;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")

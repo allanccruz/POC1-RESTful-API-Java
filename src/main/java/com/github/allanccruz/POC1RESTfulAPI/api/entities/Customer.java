@@ -44,14 +44,14 @@ public class Customer {
     @Column(nullable = false)
     private String document;
 
-    @Column(name = "person_type", nullable = false)
     @Enumerated(EnumType.STRING)
+    @Column(name = "person_type", nullable = false)
     private PersonType personType;
 
     @Column(nullable = false)
     private String phoneNumber;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer", fetch = FetchType.EAGER)
-    private List<Address> addresses = new ArrayList<>();
+    private List<CustomerAddress> customerAddresses = new ArrayList<>();
 
 }
