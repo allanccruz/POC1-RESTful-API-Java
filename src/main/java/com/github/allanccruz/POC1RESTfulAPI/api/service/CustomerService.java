@@ -17,7 +17,9 @@ public interface CustomerService {
 
     CustomerResponseDto getById(UUID id);
 
-    Page<CustomerResponseDto> findAllCustomers(Pageable pageable);
+    Page<CustomerResponseDto> getAllCustomers(Pageable pageable);
+
+    Page<CustomerResponseDto> getCustomersByName(String name, Pageable pageable);
 
     List<AddressResponseDto> getAllAddresses(UUID id);
 

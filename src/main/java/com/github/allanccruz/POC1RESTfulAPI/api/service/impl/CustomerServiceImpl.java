@@ -37,8 +37,14 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Page<CustomerResponseDto> findAllCustomers(Pageable pageable) {
+    public Page<CustomerResponseDto> getAllCustomers(Pageable pageable) {
         return customerRepository.findAll(pageable)
+                .map(customer -> mapper.map(customer, CustomerResponseDto.class));
+    }
+
+    @Override
+    public Page<CustomerResponseDto> getCustomersByName(String name, Pageable pageable) {
+        return customerRepository.findByNameContains(name, pageable)
                 .map(customer -> mapper.map(customer, CustomerResponseDto.class));
     }
 
