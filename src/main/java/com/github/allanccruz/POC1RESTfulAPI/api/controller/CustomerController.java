@@ -34,29 +34,34 @@ public class CustomerController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerRequestDto));
+    @ResponseStatus(HttpStatus.CREATED)
+    public CustomerResponseDto createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
+        return customerService.create(customerRequestDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponseDto> findCustomer(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.getById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerResponseDto findCustomer(@PathVariable UUID id) {
+        return customerService.getById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerResponseDto>> getAllCustomers() {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.findAllCustomers());
+    @ResponseStatus(HttpStatus.OK)
+    public List<CustomerResponseDto> getAllCustomers() {
+        return customerService.findAllCustomers();
     }
 
     @GetMapping("/{id}/addresses")
-    public ResponseEntity<List<AddressResponseDto>> getAllAddressesOfCustomer(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.getAllAddresses(id));
+    @ResponseStatus(HttpStatus.OK)
+    public List<AddressResponseDto> getAllAddressesOfCustomer(@PathVariable UUID id) {
+        return customerService.getAllAddresses(id);
     }
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id, updateCustomerRequestDto));
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerResponseDto updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
+        return customerService.update(id, updateCustomerRequestDto);
     }
 
     @Transactional

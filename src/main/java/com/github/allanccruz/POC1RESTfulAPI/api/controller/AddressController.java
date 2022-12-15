@@ -30,19 +30,22 @@ public class AddressController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<AddressResponseDto> createAddress(@RequestBody AddressRequestDto addressRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(mapper.map(addressService.create(addressRequestDto), AddressResponseDto.class));
+    @ResponseStatus(HttpStatus.CREATED)
+    public AddressResponseDto createAddress(@RequestBody AddressRequestDto addressRequestDto) {
+        return mapper.map(addressService.create(addressRequestDto), AddressResponseDto.class);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<AddressResponseDto> getAddressById(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.map(addressService.getById(id), AddressResponseDto.class));
+    @ResponseStatus(HttpStatus.OK)
+    public AddressResponseDto getAddressById(@PathVariable UUID id) {
+        return mapper.map(addressService.getById(id), AddressResponseDto.class);
     }
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<AddressResponseDto> updateAddress(@PathVariable UUID id, @RequestBody AddressRequestDto addressRequestDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(mapper.map(addressService.update(id, addressRequestDto), AddressResponseDto.class));
+    @ResponseStatus(HttpStatus.OK)
+    public AddressResponseDto updateAddress(@PathVariable UUID id, @RequestBody AddressRequestDto addressRequestDto) {
+        return mapper.map(addressService.update(id, addressRequestDto), AddressResponseDto.class);
     }
 
     @Transactional
