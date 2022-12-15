@@ -46,9 +46,7 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<AddressResponseDto> getAllAddresses(UUID id) {
 
-        Customer customer = customerRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+        Customer customer = mapper.map(getById(id), Customer.class);
 
         return customer
                 .getCustomerAddresses()
@@ -59,13 +57,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDto update(UUID id, UpdateCustomerRequestDto updateCustomerRequestDto) {
-        Customer customer = customerRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+        Customer customer = mapper.map(getById(id), Customer.class);
 
-        customer.setName(updateCustomerRequestDto.getName());
-        customer.setEmail(updateCustomerRequestDto.getEmail());
-        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
+        settingNewCustomerAtributes(updateCustomerRequestDto, customer);
 
         customerRepository.save(customer);
         return mapper.map(customer, CustomerResponseDto.class);
@@ -75,5 +69,11 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteById(UUID id) {
         Customer customer = mapper.map(getById(id), Customer.class);
         customerRepository.deleteById(customer.getId());
+    }
+
+    private static void settingNewCustomerAtributes(UpdateCustomerRequestDto updateCustomerRequestDto, Customer customer) {
+        customer.setName(updateCustomerRequestDto.getName());
+        customer.setEmail(updateCustomerRequestDto.getEmail());
+        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
     }
 }

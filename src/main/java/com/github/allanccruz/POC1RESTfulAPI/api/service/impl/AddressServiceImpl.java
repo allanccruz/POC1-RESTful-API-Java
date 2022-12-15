@@ -34,21 +34,15 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressResponseDto create(AddressRequestDto addressRequestDto) {
 
-        //SETUP DO MAPPER PARA ATRIBUTOS COM NOMES DIFERENTES
         addressMapperSetup.addressRequestDtoToCustomerAddress();
 
-        //CONSUMINDO API EXTERNA
         zipCodeValidation(addressRequestDto);
 
-        Customer customer = customerRepository
-                .findById(addressRequestDto.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+        Customer customer = existCustomerById(addressRequestDto);
 
-        addressRequestDto.setMainAddress(customer.getCustomerAddresses().isEmpty());
+        settingMainAddress(addressRequestDto, customer);
 
-        if (customer.getCustomerAddresses().size() == 5) {
-            throw new RuntimeException("Limit of addresses reached!");
-        }
+        limitOfAddressesValidation(customer);
 
         CustomerAddress customerAddress = addressRepository.save(mapper.map(addressRequestDto, CustomerAddress.class));
 
@@ -64,30 +58,13 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponseDto update(UUID id, AddressRequestDto addressRequestDto) {
-        CustomerAddress customerAddress = addressRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found!"));
+        CustomerAddress customerAddress = existAddressById(id);
 
-        //CONSUMINDO API EXTERNA
         zipCodeValidation(addressRequestDto);
 
-        customerAddress.setZipcode(addressRequestDto.getCep());
-        customerAddress.setCity(addressRequestDto.getLocalidade());
-        customerAddress.setNeighborhood(addressRequestDto.getBairro());
-        customerAddress.setAddress(addressRequestDto.getLogradouro());
-        customerAddress.setNumber(addressRequestDto.getNumero());
-        customerAddress.setComplement(addressRequestDto.getComplemento());
+        settingNewAddressAtributes(addressRequestDto, customerAddress);
 
-        if (Boolean.TRUE.equals(addressRequestDto.getMainAddress())) {
-            customerAddress.getCustomer().getCustomerAddresses()
-                    .stream()
-                    .forEach(addr -> addr.setMainAddress(false));
-
-            customerAddress.setMainAddress(true);
-        } else if (Boolean.TRUE.equals(customerAddress.getMainAddress())) {
-            throw new RuntimeException("You must have at least one main address!");
-        }
-
+        ensuringOneMainAddressAtATime(addressRequestDto, customerAddress);
 
         addressRepository.save(customerAddress);
 
@@ -125,5 +102,49 @@ public class AddressServiceImpl implements AddressService {
             throw new RuntimeException("CEP inválido!");
         }
     }
+
+    private static void limitOfAddressesValidation(Customer customer) {
+        if (customer.getCustomerAddresses().size() == 5) {
+            throw new RuntimeException("Limit of addresses reached!");
+        }
+    }
+
+    private Customer existCustomerById(AddressRequestDto addressRequestDto) {
+       return customerRepository
+                .findById(addressRequestDto.getCustomerId())
+                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+    }
+
+    private static void settingMainAddress(AddressRequestDto addressRequestDto, Customer customer) {
+        addressRequestDto.setMainAddress(customer.getCustomerAddresses().isEmpty());
+    }
+
+    private CustomerAddress existAddressById(UUID id) {
+        return addressRepository
+                .findById(id)
+                .orElseThrow(() -> new RuntimeException("Address not found!"));
+    }
+
+    private static void settingNewAddressAtributes(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+        customerAddress.setZipcode(addressRequestDto.getCep());
+        customerAddress.setCity(addressRequestDto.getLocalidade());
+        customerAddress.setNeighborhood(addressRequestDto.getBairro());
+        customerAddress.setAddress(addressRequestDto.getLogradouro());
+        customerAddress.setNumber(addressRequestDto.getNumero());
+        customerAddress.setComplement(addressRequestDto.getComplemento());
+    }
+
+    private static void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+        if (Boolean.TRUE.equals(addressRequestDto.getMainAddress())) {
+            customerAddress.getCustomer().getCustomerAddresses()
+                    .stream()
+                    .forEach(addr -> addr.setMainAddress(false));
+
+            customerAddress.setMainAddress(true);
+        } else if (Boolean.TRUE.equals(customerAddress.getMainAddress())) {
+            throw new RuntimeException("You must have at least one main address!");
+        }
+    }
+
 
 }
