@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,12 +37,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerResponseDto> findAllCustomers() {
-        return customerRepository
-                .findAll()
-                .stream()
-                .map(customer -> mapper.map(customer, CustomerResponseDto.class))
-                .toList();
+    public Page<CustomerResponseDto> findAllCustomers(Pageable pageable) {
+        return customerRepository.findAll(pageable)
+                .map(customer -> mapper.map(customer, CustomerResponseDto.class));
     }
 
     @Override

@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,8 +51,9 @@ public class CustomerController {
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<CustomerResponseDto> getAllCustomers() {
-        return customerService.findAllCustomers();
+    public Page<CustomerResponseDto> getAllCustomers(
+            @PageableDefault (size = 5, sort = {"name"}, direction = Sort.Direction.ASC) Pageable pageable) {
+        return customerService.findAllCustomers(pageable);
     }
 
     @GetMapping("/{id}/addresses")
