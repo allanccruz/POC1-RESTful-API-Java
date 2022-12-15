@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,20 +37,21 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerResponseDto> findAllCustomers() {
-        return customerRepository
-                .findAll()
-                .stream()
-                .map(customer -> mapper.map(customer, CustomerResponseDto.class))
-                .toList();
+    public Page<CustomerResponseDto> getAllCustomers(Pageable pageable) {
+        return customerRepository.findAll(pageable)
+                .map(customer -> mapper.map(customer, CustomerResponseDto.class));
+    }
+
+    @Override
+    public Page<CustomerResponseDto> getCustomersByName(String name, Pageable pageable) {
+        return customerRepository.findByNameContains(name, pageable)
+                .map(customer -> mapper.map(customer, CustomerResponseDto.class));
     }
 
     @Override
     public List<AddressResponseDto> getAllAddresses(UUID id) {
 
-        Customer customer = customerRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+        Customer customer = mapper.map(getById(id), Customer.class);
 
         return customer
                 .getCustomerAddresses()
@@ -59,13 +62,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerResponseDto update(UUID id, UpdateCustomerRequestDto updateCustomerRequestDto) {
-        Customer customer = customerRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+        Customer customer = mapper.map(getById(id), Customer.class);
 
-        customer.setName(updateCustomerRequestDto.getName());
-        customer.setEmail(updateCustomerRequestDto.getEmail());
-        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
+        settingNewCustomerAtributes(updateCustomerRequestDto, customer);
 
         customerRepository.save(customer);
         return mapper.map(customer, CustomerResponseDto.class);
@@ -75,5 +74,11 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteById(UUID id) {
         Customer customer = mapper.map(getById(id), Customer.class);
         customerRepository.deleteById(customer.getId());
+    }
+
+    private static void settingNewCustomerAtributes(UpdateCustomerRequestDto updateCustomerRequestDto, Customer customer) {
+        customer.setName(updateCustomerRequestDto.getName());
+        customer.setEmail(updateCustomerRequestDto.getEmail());
+        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
     }
 }

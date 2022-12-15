@@ -11,8 +11,11 @@ import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,29 +38,40 @@ public class CustomerController {
 
     @PostMapping
     @Transactional
-    public ResponseEntity<CustomerResponseDto> createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(customerService.create(customerRequestDto));
+    @ResponseStatus(HttpStatus.CREATED)
+    public CustomerResponseDto createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
+        return customerService.create(customerRequestDto);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CustomerResponseDto> findCustomer(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.getById(id));
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerResponseDto findCustomer(@PathVariable UUID id) {
+        return customerService.getById(id);
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerResponseDto>> getAllCustomers() {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.findAllCustomers());
+    @ResponseStatus(HttpStatus.OK)
+    public Page<CustomerResponseDto> getAllCustomers(
+            @PageableDefault(size = 5, sort = {"name"}, direction = Sort.Direction.ASC) Pageable pageable) {
+        return customerService.getAllCustomers(pageable);
+    }
+
+    @GetMapping("/filter")
+    public Page<CustomerResponseDto> getCustomersByName(@RequestParam String name, Pageable pageable) {
+        return customerService.getCustomersByName(name, pageable);
     }
 
     @GetMapping("/{id}/addresses")
-    public ResponseEntity<List<AddressResponseDto>> getAllAddressesOfCustomer(@PathVariable UUID id) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.getAllAddresses(id));
+    @ResponseStatus(HttpStatus.OK)
+    public List<AddressResponseDto> getAllAddressesOfCustomer(@PathVariable UUID id) {
+        return customerService.getAllAddresses(id);
     }
 
     @Transactional
     @PutMapping("/{id}")
-    public ResponseEntity<CustomerResponseDto> updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
-        return ResponseEntity.status(HttpStatus.OK).body(customerService.update(id, updateCustomerRequestDto));
+    @ResponseStatus(HttpStatus.OK)
+    public CustomerResponseDto updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
+        return customerService.update(id, updateCustomerRequestDto);
     }
 
     @Transactional
