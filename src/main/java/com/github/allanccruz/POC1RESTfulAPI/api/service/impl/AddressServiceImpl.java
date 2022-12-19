@@ -4,6 +4,8 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.CustomerAddress;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
+import com.github.allanccruz.POC1RESTfulAPI.api.enums.Errors;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.AddressRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
@@ -53,7 +55,7 @@ public class AddressServiceImpl implements AddressService {
     public AddressResponseDto getById(UUID id) {
         return mapper.map(addressRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found!")), AddressResponseDto.class);
+                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode())), AddressResponseDto.class);
     }
 
     @Override
@@ -112,7 +114,7 @@ public class AddressServiceImpl implements AddressService {
     private Customer findCustomerById(AddressRequestDto addressRequestDto) {
        return customerRepository
                 .findById(addressRequestDto.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
+                .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
     }
 
     private static void settingMainAddress(AddressRequestDto addressRequestDto, Customer customer) {
@@ -122,7 +124,7 @@ public class AddressServiceImpl implements AddressService {
     private CustomerAddress findAddressById(UUID id) {
         return addressRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found!"));
+                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode()));
     }
 
     private static void settingNewAddressAtributes(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {

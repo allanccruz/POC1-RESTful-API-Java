@@ -5,6 +5,8 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.UpdateCustomerReques
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
+import com.github.allanccruz.POC1RESTfulAPI.api.enums.Errors;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import java.util.List;
@@ -33,7 +35,7 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerResponseDto getById(UUID id) {
         return mapper.map(customerRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Customer not found!")), CustomerResponseDto.class);
+                .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode())), CustomerResponseDto.class);
     }
 
     @Override
