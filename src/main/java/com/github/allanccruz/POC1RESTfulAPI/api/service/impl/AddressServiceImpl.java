@@ -34,11 +34,11 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public AddressResponseDto create(AddressRequestDto addressRequestDto) {
 
-        addressMapperSetup.addressRequestDtoToCustomerAddress();
+        addressMapperSetup.addressRequestDtoToCustomerAddress(mapper);
 
         zipCodeValidation(addressRequestDto);
 
-        Customer customer = existCustomerById(addressRequestDto);
+        Customer customer = findCustomerById(addressRequestDto);
 
         settingMainAddress(addressRequestDto, customer);
 
@@ -58,7 +58,7 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressResponseDto update(UUID id, AddressRequestDto addressRequestDto) {
-        CustomerAddress customerAddress = existAddressById(id);
+        CustomerAddress customerAddress = findAddressById(id);
 
         zipCodeValidation(addressRequestDto);
 
@@ -109,7 +109,7 @@ public class AddressServiceImpl implements AddressService {
         }
     }
 
-    private Customer existCustomerById(AddressRequestDto addressRequestDto) {
+    private Customer findCustomerById(AddressRequestDto addressRequestDto) {
        return customerRepository
                 .findById(addressRequestDto.getCustomerId())
                 .orElseThrow(() -> new RuntimeException("Customer not found!"));
@@ -119,7 +119,7 @@ public class AddressServiceImpl implements AddressService {
         addressRequestDto.setMainAddress(customer.getCustomerAddresses().isEmpty());
     }
 
-    private CustomerAddress existAddressById(UUID id) {
+    private CustomerAddress findAddressById(UUID id) {
         return addressRepository
                 .findById(id)
                 .orElseThrow(() -> new RuntimeException("Address not found!"));
