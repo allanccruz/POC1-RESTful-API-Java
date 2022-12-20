@@ -8,6 +8,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.enums.Errors;
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.InvalidZipcodeException;
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.LimitOfAddressesException;
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.OneMainAddressException;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.AddressRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
@@ -90,7 +91,7 @@ public class AddressServiceImpl implements AddressService {
 
             customerAddress.setMainAddress(true);
         } else if (Boolean.TRUE.equals(customerAddress.getMainAddress())) {
-            throw new RuntimeException("You must have at least one main address!");
+            throw new OneMainAddressException(Errors.PC204.getMessage(), Errors.PC204.getCode());
         }
     }
 

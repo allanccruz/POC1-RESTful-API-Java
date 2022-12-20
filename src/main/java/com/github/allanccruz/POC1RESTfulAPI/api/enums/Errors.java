@@ -10,7 +10,8 @@ public enum Errors {
     PC101("PC-101", "This customer does not exists."),
     PC201("PC-201", "This address does not exists."),
     PC202("PC-202", "Invalid zipcode given. Please, give a valid zipcode."),
-    PC203("PC-203", "Limit of this customer addresses reached.");
+    PC203("PC-203", "Limit of this customer addresses reached."),
+    PC204("PC-204", "You must have at least one main address.");
 
     private final String code;
 

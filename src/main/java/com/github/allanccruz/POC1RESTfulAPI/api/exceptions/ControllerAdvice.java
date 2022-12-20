@@ -56,4 +56,19 @@ public class ControllerAdvice {
 
     }
 
+    @ExceptionHandler(OneMainAddressException.class)
+    public ResponseEntity<ErrorResponse> handleOneMainAddressException(OneMainAddressException exception, WebRequest request) {
+
+        ErrorResponse response = new ErrorResponse();
+
+        response.setHttpCode(HttpStatus.CONFLICT.value());
+        response.setMessage(exception.getMessage());
+        response.setInternalCode(exception.getErrorCode());
+        response.setPath(request.getDescription(false));
+        response.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+
+    }
+
 }
