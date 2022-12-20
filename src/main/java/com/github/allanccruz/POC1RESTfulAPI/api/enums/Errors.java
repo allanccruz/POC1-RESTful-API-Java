@@ -7,6 +7,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum Errors {
 
+    PC001("PC-001", "Invalid request."),
     PC101("PC-101", "This customer does not exists."),
     PC201("PC-201", "This address does not exists."),
     PC202("PC-202", "Invalid zipcode given. Please, give a valid zipcode."),
