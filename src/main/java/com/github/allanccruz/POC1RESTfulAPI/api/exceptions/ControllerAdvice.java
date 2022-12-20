@@ -26,4 +26,34 @@ public class ControllerAdvice {
 
     }
 
+    @ExceptionHandler(InvalidZipcodeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidZipcodeException(InvalidZipcodeException exception, WebRequest request) {
+
+        ErrorResponse response = new ErrorResponse();
+
+        response.setHttpCode(HttpStatus.BAD_REQUEST.value());
+        response.setMessage(exception.getMessage());
+        response.setInternalCode(exception.getErrorCode());
+        response.setPath(request.getDescription(false));
+        response.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+    }
+
+    @ExceptionHandler(LimitOfAddressesException.class)
+    public ResponseEntity<ErrorResponse> handleLimitOfAddressesException(LimitOfAddressesException exception, WebRequest request) {
+
+        ErrorResponse response = new ErrorResponse();
+
+        response.setHttpCode(HttpStatus.CONFLICT.value());
+        response.setMessage(exception.getMessage());
+        response.setInternalCode(exception.getErrorCode());
+        response.setPath(request.getDescription(false));
+        response.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+
+    }
+
 }

@@ -3,12 +3,11 @@ package com.github.allanccruz.POC1RESTfulAPI.api.controller;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
-import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,9 +28,8 @@ public class AddressController {
     private final AddressService addressService;
 
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
-    public AddressResponseDto createAddress(@RequestBody AddressRequestDto addressRequestDto) {
+    public AddressResponseDto createAddress(@RequestBody @Valid AddressRequestDto addressRequestDto) {
         return mapper.map(addressService.create(addressRequestDto), AddressResponseDto.class);
     }
 
@@ -41,14 +39,12 @@ public class AddressController {
         return mapper.map(addressService.getById(id), AddressResponseDto.class);
     }
 
-    @Transactional
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public AddressResponseDto updateAddress(@PathVariable UUID id, @RequestBody AddressRequestDto addressRequestDto) {
+    public AddressResponseDto updateAddress(@PathVariable UUID id, @RequestBody @Valid AddressRequestDto addressRequestDto) {
         return mapper.map(addressService.update(id, addressRequestDto), AddressResponseDto.class);
     }
 
-    @Transactional
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteAddress(@PathVariable UUID id) {
