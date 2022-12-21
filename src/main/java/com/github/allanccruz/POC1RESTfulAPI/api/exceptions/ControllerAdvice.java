@@ -6,6 +6,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.enums.Errors;
 import java.time.LocalDateTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -94,4 +95,18 @@ public class ControllerAdvice {
 
     }
 
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException exception, WebRequest request) {
+
+        ErrorResponse response = new ErrorResponse();
+
+        response.setHttpCode(HttpStatus.UNPROCESSABLE_ENTITY.value());
+        response.setMessage(Errors.PC102.getMessage());
+        response.setInternalCode(Errors.PC102.getCode());
+        response.setPath(request.getDescription(false));
+        response.setTimestamp(LocalDateTime.now());
+
+        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(response);
+
+    }
 }
