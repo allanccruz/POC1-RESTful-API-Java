@@ -5,7 +5,6 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.UpdateCustomerReques
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
-import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -37,7 +36,6 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PostMapping
-    @Transactional
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponseDto createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
         return customerService.create(customerRequestDto);
@@ -67,14 +65,12 @@ public class CustomerController {
         return customerService.getAllAddresses(id);
     }
 
-    @Transactional
     @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public CustomerResponseDto updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
         return customerService.update(id, updateCustomerRequestDto);
     }
 
-    @Transactional
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCustomer(@PathVariable UUID id) {

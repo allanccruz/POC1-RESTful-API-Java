@@ -2,18 +2,25 @@ package com.github.allanccruz.POC1RESTfulAPI.api.service.impl;
 
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
-import com.github.allanccruz.POC1RESTfulAPI.api.entities.CustomerAddress;
 import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
+import com.github.allanccruz.POC1RESTfulAPI.api.entities.CustomerAddress;
+import com.github.allanccruz.POC1RESTfulAPI.api.enums.Errors;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.InvalidZipcodeException;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.LimitOfAddressesException;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.OneMainAddressException;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.AddressRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
 import com.github.allanccruz.POC1RESTfulAPI.api.util.AddressMapperUtil;
 import com.google.gson.Gson;
+import jakarta.transaction.Transactional;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import org.modelmapper.ModelMapper;
@@ -32,13 +39,14 @@ public class AddressServiceImpl implements AddressService {
     private final AddressMapperUtil addressMapperSetup;
 
     @Override
+    @Transactional
     public AddressResponseDto create(AddressRequestDto addressRequestDto) {
 
-        addressMapperSetup.addressRequestDtoToCustomerAddress();
+        addressMapperSetup.addressRequestDtoToCustomerAddress(mapper);
 
         zipCodeValidation(addressRequestDto);
 
-        Customer customer = existCustomerById(addressRequestDto);
+        Customer customer = findCustomerById(addressRequestDto);
 
         settingMainAddress(addressRequestDto, customer);
 
@@ -53,12 +61,14 @@ public class AddressServiceImpl implements AddressService {
     public AddressResponseDto getById(UUID id) {
         return mapper.map(addressRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found!")), AddressResponseDto.class);
+                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode())), AddressResponseDto.class);
     }
 
     @Override
+    @Transactional
     public AddressResponseDto update(UUID id, AddressRequestDto addressRequestDto) {
-        CustomerAddress customerAddress = existAddressById(id);
+        CustomerAddress customerAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode()));
 
         zipCodeValidation(addressRequestDto);
 
@@ -72,18 +82,25 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
-        CustomerAddress customerAddress = mapper.map(getById(id), CustomerAddress.class);
-        addressRepository.deleteById(customerAddress.getId());
+        AddressResponseDto address = getById(id);
+        addressRepository.deleteById(address.getId());
     }
 
-    private static void zipCodeValidation(AddressRequestDto addressRequestDto) {
+    private Customer findCustomerById(AddressRequestDto addressRequestDto) {
+        return customerRepository
+                .findById(addressRequestDto.getCustomerId())
+                .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
+    }
+
+    private void zipCodeValidation(AddressRequestDto addressRequestDto) {
         try {
 
             URL url = new URL("https://viacep.com.br/ws/" + addressRequestDto.getCep() + "/json/");
             URLConnection connection = url.openConnection();
             InputStream inputStream = connection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
 
             String line = "";
             StringBuilder jsonCep = new StringBuilder();
@@ -99,33 +116,21 @@ public class AddressServiceImpl implements AddressService {
             addressRequestDto.setLogradouro(addressRequestDtoAux.getLogradouro());
 
         } catch (Exception e) {
-            throw new RuntimeException("CEP inválido!");
+            throw new InvalidZipcodeException(Errors.PC202.getMessage(), Errors.PC202.getCode());
         }
     }
 
-    private static void limitOfAddressesValidation(Customer customer) {
+    private void limitOfAddressesValidation(Customer customer) {
         if (customer.getCustomerAddresses().size() == 5) {
-            throw new RuntimeException("Limit of addresses reached!");
+            throw new LimitOfAddressesException(Errors.PC203.getMessage(), Errors.PC203.getCode());
         }
     }
 
-    private Customer existCustomerById(AddressRequestDto addressRequestDto) {
-       return customerRepository
-                .findById(addressRequestDto.getCustomerId())
-                .orElseThrow(() -> new RuntimeException("Customer not found!"));
-    }
-
-    private static void settingMainAddress(AddressRequestDto addressRequestDto, Customer customer) {
+    private void settingMainAddress(AddressRequestDto addressRequestDto, Customer customer) {
         addressRequestDto.setMainAddress(customer.getCustomerAddresses().isEmpty());
     }
 
-    private CustomerAddress existAddressById(UUID id) {
-        return addressRepository
-                .findById(id)
-                .orElseThrow(() -> new RuntimeException("Address not found!"));
-    }
-
-    private static void settingNewAddressAtributes(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+    private void settingNewAddressAtributes(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
         customerAddress.setZipcode(addressRequestDto.getCep());
         customerAddress.setCity(addressRequestDto.getLocalidade());
         customerAddress.setNeighborhood(addressRequestDto.getBairro());
@@ -134,7 +139,7 @@ public class AddressServiceImpl implements AddressService {
         customerAddress.setComplement(addressRequestDto.getComplemento());
     }
 
-    private static void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+    private void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
         if (Boolean.TRUE.equals(addressRequestDto.getMainAddress())) {
             customerAddress.getCustomer().getCustomerAddresses()
                     .stream()
@@ -142,9 +147,7 @@ public class AddressServiceImpl implements AddressService {
 
             customerAddress.setMainAddress(true);
         } else if (Boolean.TRUE.equals(customerAddress.getMainAddress())) {
-            throw new RuntimeException("You must have at least one main address!");
+            throw new OneMainAddressException(Errors.PC204.getMessage(), Errors.PC204.getCode());
         }
     }
-
-
 }
