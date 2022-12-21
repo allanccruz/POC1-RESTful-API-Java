@@ -38,63 +38,6 @@ public class AddressServiceImpl implements AddressService {
 
     private final AddressMapperUtil addressMapperSetup;
 
-    private static void zipCodeValidation(AddressRequestDto addressRequestDto) {
-        try {
-
-            URL url = new URL("https://viacep.com.br/ws/" + addressRequestDto.getCep() + "/json/");
-            URLConnection connection = url.openConnection();
-            InputStream inputStream = connection.getInputStream();
-            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-
-            String line = "";
-            StringBuilder jsonCep = new StringBuilder();
-
-            while ((line = br.readLine()) != null) {
-                jsonCep.append(line);
-            }
-
-            AddressRequestDto addressRequestDtoAux = new Gson().fromJson(jsonCep.toString(), AddressRequestDto.class);
-
-            addressRequestDto.setLocalidade(addressRequestDtoAux.getLocalidade());
-            addressRequestDto.setBairro(addressRequestDtoAux.getBairro());
-            addressRequestDto.setLogradouro(addressRequestDtoAux.getLogradouro());
-
-        } catch (Exception e) {
-            throw new InvalidZipcodeException(Errors.PC202.getMessage(), Errors.PC202.getCode());
-        }
-    }
-
-    private static void limitOfAddressesValidation(Customer customer) {
-        if (customer.getCustomerAddresses().size() == 5) {
-            throw new LimitOfAddressesException(Errors.PC203.getMessage(), Errors.PC203.getCode());
-        }
-    }
-
-    private static void settingMainAddress(AddressRequestDto addressRequestDto, Customer customer) {
-        addressRequestDto.setMainAddress(customer.getCustomerAddresses().isEmpty());
-    }
-
-    private static void settingNewAddressAtributes(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
-        customerAddress.setZipcode(addressRequestDto.getCep());
-        customerAddress.setCity(addressRequestDto.getLocalidade());
-        customerAddress.setNeighborhood(addressRequestDto.getBairro());
-        customerAddress.setAddress(addressRequestDto.getLogradouro());
-        customerAddress.setNumber(addressRequestDto.getNumero());
-        customerAddress.setComplement(addressRequestDto.getComplemento());
-    }
-
-    private static void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
-        if (Boolean.TRUE.equals(addressRequestDto.getMainAddress())) {
-            customerAddress.getCustomer().getCustomerAddresses()
-                    .stream()
-                    .forEach(addr -> addr.setMainAddress(false));
-
-            customerAddress.setMainAddress(true);
-        } else if (Boolean.TRUE.equals(customerAddress.getMainAddress())) {
-            throw new OneMainAddressException(Errors.PC204.getMessage(), Errors.PC204.getCode());
-        }
-    }
-
     @Override
     @Transactional
     public AddressResponseDto create(AddressRequestDto addressRequestDto) {
@@ -124,7 +67,8 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressResponseDto update(UUID id, AddressRequestDto addressRequestDto) {
-        CustomerAddress customerAddress = findAddressById(id);
+        CustomerAddress customerAddress = addressRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode()));
 
         zipCodeValidation(addressRequestDto);
 
@@ -140,8 +84,8 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public void delete(UUID id) {
-        CustomerAddress customerAddress = mapper.map(getById(id), CustomerAddress.class);
-        addressRepository.deleteById(customerAddress.getId());
+        AddressResponseDto address = getById(id);
+        addressRepository.deleteById(address.getId());
     }
 
     private Customer findCustomerById(AddressRequestDto addressRequestDto) {
@@ -150,11 +94,60 @@ public class AddressServiceImpl implements AddressService {
                 .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
     }
 
-    private CustomerAddress findAddressById(UUID id) {
-        return addressRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode()));
+    private void zipCodeValidation(AddressRequestDto addressRequestDto) {
+        try {
+
+            URL url = new URL("https://viacep.com.br/ws/" + addressRequestDto.getCep() + "/json/");
+            URLConnection connection = url.openConnection();
+            InputStream inputStream = connection.getInputStream();
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+
+            String line = "";
+            StringBuilder jsonCep = new StringBuilder();
+
+            while ((line = br.readLine()) != null) {
+                jsonCep.append(line);
+            }
+
+            AddressRequestDto addressRequestDtoAux = new Gson().fromJson(jsonCep.toString(), AddressRequestDto.class);
+
+            addressRequestDto.setLocalidade(addressRequestDtoAux.getLocalidade());
+            addressRequestDto.setBairro(addressRequestDtoAux.getBairro());
+            addressRequestDto.setLogradouro(addressRequestDtoAux.getLogradouro());
+
+        } catch (Exception e) {
+            throw new InvalidZipcodeException(Errors.PC202.getMessage(), Errors.PC202.getCode());
+        }
     }
 
+    private void limitOfAddressesValidation(Customer customer) {
+        if (customer.getCustomerAddresses().size() == 5) {
+            throw new LimitOfAddressesException(Errors.PC203.getMessage(), Errors.PC203.getCode());
+        }
+    }
 
+    private void settingMainAddress(AddressRequestDto addressRequestDto, Customer customer) {
+        addressRequestDto.setMainAddress(customer.getCustomerAddresses().isEmpty());
+    }
+
+    private void settingNewAddressAtributes(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+        customerAddress.setZipcode(addressRequestDto.getCep());
+        customerAddress.setCity(addressRequestDto.getLocalidade());
+        customerAddress.setNeighborhood(addressRequestDto.getBairro());
+        customerAddress.setAddress(addressRequestDto.getLogradouro());
+        customerAddress.setNumber(addressRequestDto.getNumero());
+        customerAddress.setComplement(addressRequestDto.getComplemento());
+    }
+
+    private void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+        if (Boolean.TRUE.equals(addressRequestDto.getMainAddress())) {
+            customerAddress.getCustomer().getCustomerAddresses()
+                    .stream()
+                    .forEach(addr -> addr.setMainAddress(false));
+
+            customerAddress.setMainAddress(true);
+        } else if (Boolean.TRUE.equals(customerAddress.getMainAddress())) {
+            throw new OneMainAddressException(Errors.PC204.getMessage(), Errors.PC204.getCode());
+        }
+    }
 }

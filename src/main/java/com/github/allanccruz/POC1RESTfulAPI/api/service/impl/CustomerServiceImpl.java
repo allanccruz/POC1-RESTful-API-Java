@@ -26,12 +26,6 @@ public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
 
-    private static void settingNewCustomerAtributes(UpdateCustomerRequestDto updateCustomerRequestDto, Customer customer) {
-        customer.setName(updateCustomerRequestDto.getName());
-        customer.setEmail(updateCustomerRequestDto.getEmail());
-        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
-    }
-
     @Override
     @Transactional
     public CustomerResponseDto create(CustomerRequestDto customerRequestDto) {
@@ -86,5 +80,11 @@ public class CustomerServiceImpl implements CustomerService {
     public void deleteById(UUID id) {
         Customer customer = mapper.map(getById(id), Customer.class);
         customerRepository.deleteById(customer.getId());
+    }
+
+    private void settingNewCustomerAtributes(UpdateCustomerRequestDto updateCustomerRequestDto, Customer customer) {
+        customer.setName(updateCustomerRequestDto.getName());
+        customer.setEmail(updateCustomerRequestDto.getEmail());
+        customer.setPhoneNumber(updateCustomerRequestDto.getPhoneNumber());
     }
 }

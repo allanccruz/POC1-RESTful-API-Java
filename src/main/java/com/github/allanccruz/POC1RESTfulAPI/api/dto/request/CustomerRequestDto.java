@@ -4,8 +4,6 @@ import com.github.allanccruz.POC1RESTfulAPI.api.enums.PersonType;
 import com.github.allanccruz.POC1RESTfulAPI.api.validation.document.CnpjGroup;
 import com.github.allanccruz.POC1RESTfulAPI.api.validation.document.CpfGroup;
 import com.github.allanccruz.POC1RESTfulAPI.api.validation.document.CustomerGroupSequenceProvider;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,6 +38,7 @@ public class CustomerRequestDto {
     @NotNull(message = "Person-type field cannot be blank")
     private PersonType personType;
 
+    @NotBlank
     private String phoneNumber;
 
 }
