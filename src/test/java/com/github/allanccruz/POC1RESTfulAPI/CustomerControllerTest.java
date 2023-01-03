@@ -38,6 +38,8 @@ public class CustomerControllerTest {
 
     static String API = "/api/poc1/customers";
 
+    static UUID id = UUID.randomUUID();
+
     @Autowired
     MockMvc mvc;
 
@@ -59,7 +61,7 @@ public class CustomerControllerTest {
 
     static CustomerResponseDto createPfCustomerResponseDto() {
         return CustomerResponseDto.builder()
-                .id(UUID.randomUUID())
+                .id(id)
                 .name("Allan")
                 .email("allan@gmail.com")
                 .phoneNumber("19996873544")
@@ -80,7 +82,7 @@ public class CustomerControllerTest {
 
     static CustomerResponseDto createPjCustomerResponseDto() {
         return CustomerResponseDto.builder()
-                .id(UUID.randomUUID())
+                .id(id)
                 .name("Allan")
                 .email("allan@gmail.com")
                 .phoneNumber("19996873544")
@@ -176,5 +178,28 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("errors").isArray())
                 .andExpect(jsonPath("errors", hasSize(5)));
 
+    }
+
+    @Test
+    @DisplayName("Must return a customer sucessfully.")
+    void successfullyFindCustomerByIdTest() throws Exception {
+
+        CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
+
+        when(customerService.getById(id)).thenReturn(customerResponseDto);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(API.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("id").value(customerResponseDto.getId().toString()))
+                .andExpect(jsonPath("name").value(customerResponseDto.getName()))
+                .andExpect(jsonPath("email").value(customerResponseDto.getEmail()))
+                .andExpect(jsonPath("phoneNumber").value(customerResponseDto.getPhoneNumber()))
+                .andExpect(jsonPath("personType").value(customerResponseDto.getPersonType().toString()))
+                .andExpect(jsonPath("addresses").isArray());
     }
 }
