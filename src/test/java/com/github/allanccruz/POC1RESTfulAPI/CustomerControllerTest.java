@@ -68,13 +68,65 @@ public class CustomerControllerTest {
                 .build();
     }
 
+    static CustomerRequestDto createPjCustomerRequestDto() {
+        return CustomerRequestDto.builder()
+                .name("Allan")
+                .email("allan@gmail.com")
+                .document("33022407000179")
+                .phoneNumber("19996873544")
+                .personType(PersonType.PJ)
+                .build();
+    }
+
+    static CustomerResponseDto createPjCustomerResponseDto() {
+        return CustomerResponseDto.builder()
+                .id(UUID.randomUUID())
+                .name("Allan")
+                .email("allan@gmail.com")
+                .phoneNumber("19996873544")
+                .personType(PersonType.PJ)
+                .addresses(new ArrayList<>())
+                .build();
+    }
+
     @Test
-    @DisplayName("Must create a customer successfully.")
+    @DisplayName("Must create a PF customer successfully.")
     void successfullyCreatePfCustomerTest() throws Exception {
 
         CustomerRequestDto customerRequestDto = createPfCustomerRequestDto();
 
         CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
+
+        when(customerService.create(Mockito.any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
+
+
+        String requestBody = new ObjectMapper().writeValueAsString(customerRequestDto);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("id").value(customerResponseDto.getId().toString()))
+                .andExpect(jsonPath("name").value(customerResponseDto.getName()))
+                .andExpect(jsonPath("email").value(customerResponseDto.getEmail()))
+                .andExpect(jsonPath("phoneNumber").value(customerResponseDto.getPhoneNumber()))
+                .andExpect(jsonPath("personType").value(customerResponseDto.getPersonType().toString()))
+                .andExpect(jsonPath("addresses").isEmpty());
+
+    }
+
+    @Test
+    @DisplayName("Must create a PJ customer successfully.")
+    void successfullyCreatePjCustomerTest() throws Exception {
+
+        CustomerRequestDto customerRequestDto = createPjCustomerRequestDto();
+
+        CustomerResponseDto customerResponseDto = createPjCustomerResponseDto();
 
         when(customerService.create(Mockito.any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
 
