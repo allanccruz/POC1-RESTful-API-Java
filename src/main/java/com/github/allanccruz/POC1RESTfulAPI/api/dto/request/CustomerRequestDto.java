@@ -11,6 +11,7 @@ import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.validator.constraints.br.CNPJ;
 import org.hibernate.validator.constraints.br.CPF;
@@ -19,6 +20,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 @GroupSequenceProvider(CustomerGroupSequenceProvider.class)
 public class CustomerRequestDto {

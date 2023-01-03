@@ -1,5 +1,6 @@
 package com.github.allanccruz.POC1RESTfulAPI;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -46,19 +47,18 @@ public class CustomerControllerTest {
     @MockBean
     ModelMapper modelMapper;
 
-    @Test
-    @DisplayName("Must create a customer successfully.")
-    void createPfCustomerTest() throws Exception {
-
-        CustomerRequestDto customerRequestDto = CustomerRequestDto.builder()
+    static CustomerRequestDto createPfCustomerRequestDto() {
+        return CustomerRequestDto.builder()
                 .name("Allan")
                 .email("allan@gmail.com")
                 .document("94471339087")
                 .phoneNumber("19996873544")
                 .personType(PersonType.PF)
                 .build();
+    }
 
-        CustomerResponseDto customerResponseDto = CustomerResponseDto.builder()
+    static CustomerResponseDto createPfCustomerResponseDto() {
+        return CustomerResponseDto.builder()
                 .id(UUID.randomUUID())
                 .name("Allan")
                 .email("allan@gmail.com")
@@ -66,6 +66,15 @@ public class CustomerControllerTest {
                 .personType(PersonType.PF)
                 .addresses(new ArrayList<>())
                 .build();
+    }
+
+    @Test
+    @DisplayName("Must create a customer successfully.")
+    void successfullyCreatePfCustomerTest() throws Exception {
+
+        CustomerRequestDto customerRequestDto = createPfCustomerRequestDto();
+
+        CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
 
         when(customerService.create(Mockito.any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
 
@@ -91,9 +100,29 @@ public class CustomerControllerTest {
     }
 
     @Test
-    @DisplayName("Must not create a customer and throw an exception.")
-    public void createInvalidCustomerTest() {
+    @DisplayName("Must not create a customer and throw an exception with a list of errors of failed attributes validations.")
+    void invalidCustomerRequestTest() throws Exception {
 
+        CustomerRequestDto customerRequestDto = new CustomerRequestDto();
+
+        String requestBody = new ObjectMapper().writeValueAsString(customerRequestDto);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post(API)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(requestBody);
+
+        mvc
+                .perform(request)
+                .andExpect(status().is4xxClientError())
+                .andExpect(jsonPath("httpCode").isNumber())
+                .andExpect(jsonPath("message").isString())
+                .andExpect(jsonPath("internalCode").isString())
+                .andExpect(jsonPath("path").isString())
+                .andExpect(jsonPath("timestamp").isString())
+                .andExpect(jsonPath("errors").isArray())
+                .andExpect(jsonPath("errors", hasSize(5)));
 
     }
 }
