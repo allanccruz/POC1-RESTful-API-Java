@@ -9,6 +9,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.validator.constraints.br.CNPJ;
@@ -17,6 +18,7 @@ import org.hibernate.validator.group.GroupSequenceProvider;
 
 @Getter
 @Setter
+@Builder
 @AllArgsConstructor
 @GroupSequenceProvider(CustomerGroupSequenceProvider.class)
 public class CustomerRequestDto {
@@ -38,7 +40,7 @@ public class CustomerRequestDto {
     @NotNull(message = "Person-type field cannot be blank")
     private PersonType personType;
 
-    @NotBlank
+    @NotBlank(message = "Phone number field cannot be blank")
     private String phoneNumber;
 
 }
