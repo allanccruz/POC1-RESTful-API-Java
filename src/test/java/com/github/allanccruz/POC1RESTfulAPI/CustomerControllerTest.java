@@ -14,6 +14,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.enums.PersonType;
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.impl.CustomerServiceImpl;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -217,5 +221,28 @@ public class CustomerControllerTest {
         mvc
                 .perform(request)
                 .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @DisplayName("Must return a Page of Customers.")
+    void getAllCustomersTest() throws Exception {
+
+        CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
+
+        when(customerService.getAllCustomers(any(Pageable.class))).thenReturn(
+                (new PageImpl<CustomerResponseDto>(Collections.singletonList(customerResponseDto), PageRequest.of(0, 100), 1)));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(API)
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content").isNotEmpty())
+                .andExpect(jsonPath("content", hasSize(1)))
+                .andExpect(jsonPath("pageable.pageSize").value(100))
+                .andExpect(jsonPath("pageable.pageNumber").value(0))
+                .andExpect(jsonPath("totalElements").value(1));
     }
 }
