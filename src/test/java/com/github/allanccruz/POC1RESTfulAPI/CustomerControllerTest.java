@@ -1,6 +1,7 @@
 package com.github.allanccruz.POC1RESTfulAPI;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -10,13 +11,13 @@ import com.github.allanccruz.POC1RESTfulAPI.api.controller.CustomerController;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.enums.PersonType;
+import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.impl.CustomerServiceImpl;
 import java.util.ArrayList;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -99,7 +100,7 @@ public class CustomerControllerTest {
 
         CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
 
-        when(customerService.create(Mockito.any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
+        when(customerService.create(any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
 
 
         String requestBody = new ObjectMapper().writeValueAsString(customerRequestDto);
@@ -130,7 +131,7 @@ public class CustomerControllerTest {
 
         CustomerResponseDto customerResponseDto = createPjCustomerResponseDto();
 
-        when(customerService.create(Mockito.any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
+        when(customerService.create(any(CustomerRequestDto.class))).thenReturn(customerResponseDto);
 
 
         String requestBody = new ObjectMapper().writeValueAsString(customerRequestDto);
@@ -201,5 +202,20 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("phoneNumber").value(customerResponseDto.getPhoneNumber()))
                 .andExpect(jsonPath("personType").value(customerResponseDto.getPersonType().toString()))
                 .andExpect(jsonPath("addresses").isArray());
+    }
+
+    @Test
+    @DisplayName("Must return NotFoundException when trying find an Customer that doesn't exist.")
+    void customerNotFoundTest() throws Exception {
+
+        when(customerService.getById(any(UUID.class))).thenThrow(NotFoundException.class);
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(API.concat("/" + id))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isNotFound());
     }
 }
