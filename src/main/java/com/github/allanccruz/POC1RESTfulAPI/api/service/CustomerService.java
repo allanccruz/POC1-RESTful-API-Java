@@ -15,16 +15,16 @@ public interface CustomerService {
 
     CustomerResponseDto create(CustomerRequestDto customerRequestDto);
 
-    CustomerResponseDto getById(UUID id);
+    CustomerResponseDto getById(UUID customerId);
 
     Page<CustomerResponseDto> getAllCustomers(Pageable pageable);
 
     Page<CustomerResponseDto> getCustomersByName(String name, Pageable pageable);
 
-    List<AddressResponseDto> getAllAddresses(UUID id);
+    List<AddressResponseDto> getAllAddresses(UUID customerId);
 
-    void deleteById(UUID id);
+    void deleteById(UUID customerId);
 
-    CustomerResponseDto update(UUID id, UpdateCustomerRequestDto updateCustomerRequestDto);
+    CustomerResponseDto update(UUID customerId, UpdateCustomerRequestDto updateCustomerRequestDto);
 
 }

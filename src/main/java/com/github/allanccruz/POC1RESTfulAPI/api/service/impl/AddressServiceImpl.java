@@ -40,17 +40,19 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public AddressResponseDto create(AddressRequestDto addressRequestDto) {
+    public AddressResponseDto create(UUID customerId, AddressRequestDto addressRequestDto) {
 
         addressMapperSetup.addressRequestDtoToCustomerAddress(mapper);
 
         zipCodeValidation(addressRequestDto);
 
-        Customer customer = findCustomerById(addressRequestDto);
+        Customer customer = findCustomerById(customerId);
 
         settingMainAddress(addressRequestDto, customer);
 
         limitOfAddressesValidation(customer);
+
+        addressRequestDto.setCustomerId(customerId);
 
         CustomerAddress customerAddress = addressRepository.save(mapper.map(addressRequestDto, CustomerAddress.class));
 
@@ -58,23 +60,22 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    public AddressResponseDto getById(UUID id) {
-        return mapper.map(addressRepository
-                .findById(id)
-                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode())), AddressResponseDto.class);
+    public AddressResponseDto getById(UUID addressId) {
+        return mapper.map(findAddressById(addressId), AddressResponseDto.class);
     }
 
     @Override
     @Transactional
-    public AddressResponseDto update(UUID id, AddressRequestDto addressRequestDto) {
-        CustomerAddress customerAddress = addressRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode()));
+    public AddressResponseDto update(UUID customerId, UUID addressId, AddressRequestDto addressRequestDto) {
+        Customer customer = findCustomerById(customerId);
+
+        CustomerAddress customerAddress = findAddressById(addressId);
 
         zipCodeValidation(addressRequestDto);
 
         settingNewAddressAtributes(addressRequestDto, customerAddress);
 
-        ensuringOneMainAddressAtATime(addressRequestDto, customerAddress);
+        ensuringOneMainAddressAtATime(addressRequestDto, customer, customerAddress);
 
         addressRepository.save(customerAddress);
 
@@ -83,15 +84,19 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     @Transactional
-    public void delete(UUID id) {
-        AddressResponseDto address = getById(id);
-        addressRepository.deleteById(address.getId());
+    public void delete(UUID customerId, UUID addressId) {
+        findCustomerById(customerId);
+        addressRepository.deleteById(addressId);
     }
 
-    private Customer findCustomerById(AddressRequestDto addressRequestDto) {
-        return customerRepository
-                .findById(addressRequestDto.getCustomerId())
+    private Customer findCustomerById(UUID customerId) {
+        return customerRepository.findById(customerId)
                 .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
+    }
+
+    private CustomerAddress findAddressById(UUID addressId) {
+        return addressRepository.findById(addressId)
+                .orElseThrow(() -> new NotFoundException(Errors.PC201.getMessage(), Errors.PC201.getCode()));
     }
 
     private void zipCodeValidation(AddressRequestDto addressRequestDto) {
@@ -139,10 +144,9 @@ public class AddressServiceImpl implements AddressService {
         customerAddress.setComplement(addressRequestDto.getComplemento());
     }
 
-    private void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, CustomerAddress customerAddress) {
+    private void ensuringOneMainAddressAtATime(AddressRequestDto addressRequestDto, Customer customer, CustomerAddress customerAddress) {
         if (Boolean.TRUE.equals(addressRequestDto.getMainAddress())) {
-            customerAddress.getCustomer().getCustomerAddresses()
-                    .stream()
+            customer.getCustomerAddresses()
                     .forEach(addr -> addr.setMainAddress(false));
 
             customerAddress.setMainAddress(true);
