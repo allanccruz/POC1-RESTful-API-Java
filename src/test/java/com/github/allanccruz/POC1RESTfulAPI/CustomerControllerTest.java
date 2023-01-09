@@ -2,6 +2,7 @@ package com.github.allanccruz.POC1RESTfulAPI;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -14,6 +15,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.enums.PersonType;
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.impl.CustomerServiceImpl;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
@@ -56,7 +58,7 @@ public class CustomerControllerTest {
 
     static CustomerRequestDto createPfCustomerRequestDto() {
         return CustomerRequestDto.builder()
-                .name("Allan")
+                .name("Allan Cruz")
                 .email("allan@gmail.com")
                 .document("94471339087")
                 .phoneNumber("19996873544")
@@ -67,7 +69,7 @@ public class CustomerControllerTest {
     static CustomerResponseDto createPfCustomerResponseDto() {
         return CustomerResponseDto.builder()
                 .id(id)
-                .name("Allan")
+                .name("Allan Cruz")
                 .email("allan@gmail.com")
                 .phoneNumber("19996873544")
                 .personType(PersonType.PF)
@@ -77,7 +79,7 @@ public class CustomerControllerTest {
 
     static CustomerRequestDto createPjCustomerRequestDto() {
         return CustomerRequestDto.builder()
-                .name("Allan")
+                .name("Allan Chaves")
                 .email("allan@gmail.com")
                 .document("33022407000179")
                 .phoneNumber("19996873544")
@@ -88,7 +90,7 @@ public class CustomerControllerTest {
     static CustomerResponseDto createPjCustomerResponseDto() {
         return CustomerResponseDto.builder()
                 .id(id)
-                .name("Allan")
+                .name("Allan Chaves")
                 .email("allan@gmail.com")
                 .phoneNumber("19996873544")
                 .personType(PersonType.PJ)
@@ -186,7 +188,7 @@ public class CustomerControllerTest {
     }
 
     @Test
-    @DisplayName("Must return a customer sucessfully.")
+    @DisplayName("Must return a customer successfully.")
     void successfullyFindCustomerByIdTest() throws Exception {
 
         CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
@@ -230,7 +232,7 @@ public class CustomerControllerTest {
         CustomerResponseDto customerResponseDto = createPfCustomerResponseDto();
 
         when(customerService.getAllCustomers(any(Pageable.class))).thenReturn(
-                (new PageImpl<CustomerResponseDto>(Collections.singletonList(customerResponseDto), PageRequest.of(0, 100), 1)));
+                (new PageImpl<>(Collections.singletonList(customerResponseDto), PageRequest.of(0, 100), 1)));
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .get(API)
@@ -245,4 +247,55 @@ public class CustomerControllerTest {
                 .andExpect(jsonPath("pageable.pageNumber").value(0))
                 .andExpect(jsonPath("totalElements").value(1));
     }
+
+    @Test
+    @DisplayName("Must return a filtered by name Page of Customers.")
+    void getCustomersByNameTest() throws Exception {
+
+        CustomerResponseDto pFCustomerResponseDto = createPfCustomerResponseDto();
+        CustomerResponseDto pJCustomerResponseDto = createPjCustomerResponseDto();
+        String nameContains = "All";
+
+        when(customerService.getCustomersByName(eq(nameContains), any(Pageable.class))).thenReturn(
+                (new PageImpl<>(Arrays.asList(pFCustomerResponseDto, pJCustomerResponseDto), PageRequest.of(0, 100), 2)));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(API.concat("/filter?name=" + nameContains))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content").isNotEmpty())
+                .andExpect(jsonPath("content", hasSize(2)))
+                .andExpect(jsonPath("content.[0].name").value("Allan Cruz"))
+                .andExpect(jsonPath("content.[1].name").value("Allan Chaves"))
+                .andExpect(jsonPath("pageable.pageSize").value(100))
+                .andExpect(jsonPath("pageable.pageNumber").value(0))
+                .andExpect(jsonPath("totalElements").value(2));
+    }
+
+    @Test
+    @DisplayName("Must return an empty Page of Customers.")
+    void getCustomersByNameThatDoesNotExistTest() throws Exception {
+
+        String nameContains = "Pedro";
+
+        when(customerService.getCustomersByName(eq(nameContains), any(Pageable.class))).thenReturn(
+                (new PageImpl<>(new ArrayList<>(), PageRequest.of(0, 100), 0)));
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .get(API.concat("/filter?name=" + nameContains))
+                .accept(MediaType.APPLICATION_JSON);
+
+        mvc
+                .perform(request)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("content").isEmpty())
+                .andExpect(jsonPath("content", hasSize(0)))
+                .andExpect(jsonPath("pageable.pageSize").value(100))
+                .andExpect(jsonPath("pageable.pageNumber").value(0))
+                .andExpect(jsonPath("totalElements").value(0));
+    }
+
 }
