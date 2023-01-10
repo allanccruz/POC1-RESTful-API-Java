@@ -4,6 +4,7 @@ import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.UpdateCustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
+import com.github.allanccruz.POC1RESTfulAPI.api.entities.Customer;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -26,5 +27,7 @@ public interface CustomerService {
     void deleteById(UUID customerId);
 
     CustomerResponseDto update(UUID customerId, UpdateCustomerRequestDto updateCustomerRequestDto);
+
+    Customer findCustomerById(UUID customerId);
 
 }
