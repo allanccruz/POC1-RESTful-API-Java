@@ -1,9 +1,11 @@
 package com.github.allanccruz.POC1RESTfulAPI.api.controller;
 
+import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.AddressRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.CustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.request.UpdateCustomerRequestDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.AddressResponseDto;
 import com.github.allanccruz.POC1RESTfulAPI.api.dto.response.CustomerResponseDto;
+import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -35,16 +37,18 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    private final AddressService addressService;
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public CustomerResponseDto createCustomer(@RequestBody @Valid CustomerRequestDto customerRequestDto) {
         return customerService.create(customerRequestDto);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{customerId}")
     @ResponseStatus(HttpStatus.OK)
-    public CustomerResponseDto findCustomer(@PathVariable UUID id) {
-        return customerService.getById(id);
+    public CustomerResponseDto findCustomer(@PathVariable UUID customerId) {
+        return customerService.getById(customerId);
     }
 
     @GetMapping
@@ -59,22 +63,40 @@ public class CustomerController {
         return customerService.getCustomersByName(name, pageable);
     }
 
-    @GetMapping("/{id}/addresses")
+    @PutMapping("/{customerId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<AddressResponseDto> getAllAddressesOfCustomer(@PathVariable UUID id) {
-        return customerService.getAllAddresses(id);
+    public CustomerResponseDto updateCustomer(@PathVariable UUID customerId, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
+        return customerService.update(customerId, updateCustomerRequestDto);
     }
 
-    @PutMapping("/{id}")
-    @ResponseStatus(HttpStatus.OK)
-    public CustomerResponseDto updateCustomer(@PathVariable UUID id, @RequestBody @Valid UpdateCustomerRequestDto updateCustomerRequestDto) {
-        return customerService.update(id, updateCustomerRequestDto);
-    }
-
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{customerId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteCustomer(@PathVariable UUID id) {
-        customerService.deleteById(id);
+    public void deleteCustomer(@PathVariable UUID customerId) {
+        customerService.deleteById(customerId);
     }
 
+    @PostMapping("/{customerId}/addresses")
+    @ResponseStatus(HttpStatus.CREATED)
+    public AddressResponseDto createAddress(@PathVariable UUID customerId, @RequestBody @Valid AddressRequestDto addressRequestDto) {
+        return mapper.map(addressService.create(customerId, addressRequestDto), AddressResponseDto.class);
+    }
+
+    @GetMapping("/{customerId}/addresses")
+    @ResponseStatus(HttpStatus.OK)
+    public List<AddressResponseDto> getAllAddressesOfCustomer(@PathVariable UUID customerId) {
+        return customerService.getAllAddresses(customerId);
+    }
+
+    @PutMapping("/{customerId}/addresses/{addressId}")
+    @ResponseStatus(HttpStatus.OK)
+    public AddressResponseDto updateAddress(@PathVariable UUID customerId, @PathVariable UUID addressId,
+                                            @RequestBody @Valid AddressRequestDto addressRequestDto) {
+        return mapper.map(addressService.update(customerId, addressId, addressRequestDto), AddressResponseDto.class);
+    }
+
+    @DeleteMapping("/{customerId}/addresses/{addressId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void deleteAddress(@PathVariable UUID customerId, @PathVariable UUID addressId) {
+        addressService.delete(customerId, addressId);
+    }
 }

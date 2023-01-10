@@ -8,11 +8,11 @@ import org.springframework.stereotype.Service;
 @Service
 public interface AddressService {
 
-    AddressResponseDto create(AddressRequestDto addressRequestDto);
+    AddressResponseDto create(UUID customerId, AddressRequestDto addressRequestDto);
 
-    AddressResponseDto getById(UUID id);
+    AddressResponseDto getById(UUID addressId);
 
-    void delete(UUID id);
+    void delete(UUID customerId, UUID addressId);
 
-    AddressResponseDto update(UUID id, AddressRequestDto addressRequestDto);
+    AddressResponseDto update(UUID customerId, UUID addressId, AddressRequestDto addressRequestDto);
 }

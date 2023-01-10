@@ -55,7 +55,9 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<AddressResponseDto> getAllAddresses(UUID id) {
 
-        Customer customer = mapper.map(getById(id), Customer.class);
+        Customer customer = customerRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
 
         return customer
                 .getCustomerAddresses()

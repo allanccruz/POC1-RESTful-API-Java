@@ -29,6 +29,7 @@ public class AddressRequestDto {
     @NotBlank(message = "Zipcode field cannot be blank")
     private String cep;
 
+    @JsonIgnore
     private UUID customerId;
 
     private Boolean mainAddress;
