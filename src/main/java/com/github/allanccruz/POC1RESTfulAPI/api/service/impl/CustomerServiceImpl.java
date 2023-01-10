@@ -78,10 +78,16 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    @Transactional
     public void deleteById(UUID id) {
         Customer customer = mapper.map(getById(id), Customer.class);
         customerRepository.deleteById(customer.getId());
+    }
+
+
+    @Override
+    public Customer findCustomerById(UUID customerId) {
+        return customerRepository.findById(customerId)
+                .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
     }
 
     private void settingNewCustomerAtributes(UpdateCustomerRequestDto updateCustomerRequestDto, Customer customer) {

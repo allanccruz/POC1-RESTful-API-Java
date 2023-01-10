@@ -10,8 +10,8 @@ import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.LimitOfAddressesExcep
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.NotFoundException;
 import com.github.allanccruz.POC1RESTfulAPI.api.exceptions.OneMainAddressException;
 import com.github.allanccruz.POC1RESTfulAPI.api.repository.AddressRepository;
-import com.github.allanccruz.POC1RESTfulAPI.api.repository.CustomerRepository;
 import com.github.allanccruz.POC1RESTfulAPI.api.service.AddressService;
+import com.github.allanccruz.POC1RESTfulAPI.api.service.CustomerService;
 import com.github.allanccruz.POC1RESTfulAPI.api.util.AddressMapperUtil;
 import com.google.gson.Gson;
 import jakarta.transaction.Transactional;
@@ -34,7 +34,7 @@ public class AddressServiceImpl implements AddressService {
 
     private final AddressRepository addressRepository;
 
-    private final CustomerRepository customerRepository;
+    private final CustomerService customerService;
 
     private final AddressMapperUtil addressMapperSetup;
 
@@ -46,7 +46,7 @@ public class AddressServiceImpl implements AddressService {
 
         zipCodeValidation(addressRequestDto);
 
-        Customer customer = findCustomerById(customerId);
+        Customer customer = customerService.findCustomerById(customerId);
 
         settingMainAddress(addressRequestDto, customer);
 
@@ -67,7 +67,7 @@ public class AddressServiceImpl implements AddressService {
     @Override
     @Transactional
     public AddressResponseDto update(UUID customerId, UUID addressId, AddressRequestDto addressRequestDto) {
-        Customer customer = findCustomerById(customerId);
+        Customer customer = customerService.findCustomerById(customerId);
 
         CustomerAddress customerAddress = findAddressById(addressId);
 
@@ -83,15 +83,10 @@ public class AddressServiceImpl implements AddressService {
     }
 
     @Override
-    @Transactional
     public void delete(UUID customerId, UUID addressId) {
-        findCustomerById(customerId);
-        addressRepository.deleteById(addressId);
-    }
-
-    private Customer findCustomerById(UUID customerId) {
-        return customerRepository.findById(customerId)
-                .orElseThrow(() -> new NotFoundException(Errors.PC101.getMessage(), Errors.PC101.getCode()));
+        customerService.findCustomerById(customerId);
+        CustomerAddress address = findAddressById(addressId);
+        addressRepository.deleteById(address.getId());
     }
 
     private CustomerAddress findAddressById(UUID addressId) {
