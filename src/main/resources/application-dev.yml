@@ -1,0 +1,8 @@
+spring:
+  jpa:
+    open-in-view: false
+    database: MYSQL
+  datasource:
+    url: jdbc:mysql://localhost:${PORT}/${DATABASE}?createDatabaseIfNotExist=true
+    username: ${USERNAME}
+    password: ${PASSWORD}
